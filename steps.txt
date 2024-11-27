@@ -1,0 +1,8 @@
+# convert .vdi to .box format
+vagrant package --provider "virtualbox" --base server --output server-template.box
+
+# add it to vagrant's box list
+vagrant box add server-template/jammy64 .\Vagrant\server-template.box
+
+# verify
+vagrant box list
