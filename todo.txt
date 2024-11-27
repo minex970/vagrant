@@ -1,9 +1,11 @@
 1. Create the VM using ISO file.
 2. Create the disk of size 100G, and use LVM partition
-3. Create "neeraj" user
+3. Create "minex" user:
+    adduser minex
 4. Update sudoers file:
-    echo "neeraj ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/neeraj
+    echo "minex ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/minex
 5. Install all the required packages
-    net-tools, vim, plocate, ngrep, git
+    apt install -y net-tools vim git
 6. Set the timzone
+    ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
 7. Set the netplan file
