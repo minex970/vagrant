@@ -1,0 +1,9 @@
+box_name: "server-template/jammy64"
+name: test
+hostname: test-server
+memory: "1024"
+cpu: 1
+bridge_ip: "192.168.0.116"
+bridge_gw: "192.168.0.1"
+host_ip: "192.168.59.103"
+host_network: "VirtualBox Host-Only Ethernet Adapter #2"
