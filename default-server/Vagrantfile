@@ -54,13 +54,13 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # Override the SSH settings
-  config.ssh.username = "neeraj"  # Replace with your username
-  config.ssh.password = "123456"  # Replace with your password
+  config.ssh.username = username  # Replace with your username
+  config.ssh.password = password  # Replace with your password
   config.ssh.insert_key = false
 
   # Enable provisioning (optional, for custom setup)
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   sudo date
-  # SHELL
+  config.vm.provision "shell", inline: <<-SHELL
+    apt install -y build-essential
+  SHELL
 
 end
