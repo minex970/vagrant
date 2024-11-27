@@ -1,4 +1,4 @@
-box_name: "server-template/jammy64"
+box_name: "default-server/jammy64"
 name: test
 hostname: test-server
 username: "minex"
