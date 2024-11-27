@@ -1,16 +1,34 @@
+require 'yaml'
+
 Vagrant.configure("2") do |config|
+  # Load the YAML file and parse it
+  config_data = YAML.load_file('config.yml')
+
+  # Assign values from the YAML file
+  box_name = config_data['box_name']
+  name = config_data['name']
+  hostname = config_data['hostname']
+  memory = config_data['memory']
+  cpu = config_data['cpu']
+  bridge_ip = config_data['bridge_ip']
+  host_ip = config_data['host_ip']
+  host_network = config_data['host_network']
+
+
   # Base box for Ubuntu 22.04 (Jammy)
-  config.vm.box = "ubuntu/jammy64"
+  config.vm.box = box_name
 
   # Set the hostname
-  config.vm.hostname = "test-vm"
+  config.vm.hostname = hostname
 
   # VirtualBox provider configuration
   config.vm.provider "virtualbox" do |vb|
-    vb.name = "test"
-    vb.memory = "1024"
-    vb.cpus = 1
+    vb.name = name
+    vb.memory = memory
+    vb.cpus = cpu
+    # Set the graphics controller
     vb.customize ["modifyvm", :id, "--graphicscontroller", "VMSVGA"]
+    # Enable USB
     vb.customize ["modifyvm", :id, "--usb", "on"]
     vb.customize ["modifyvm", :id, "--usbehci", "on"]
     # Set boot order to hard disk (hasddisk)
@@ -18,27 +36,21 @@ Vagrant.configure("2") do |config|
   end
 
   # Network settings
+  # Bridge network
   config.vm.network "public_network",
     type: "static",
-    ip: "192.168.0.115",
-    gateway: "192.168.0.1",
+    ip: bridge_ip,
+    gateway: bridge_gw,
     netmask: "255.255.255.0",
     nameservers: ["8.8.8.8", "8.8.4.4"]
 
+  # Host-only network
   # config.vm.network "private_network",
   #   type: "static",
-  #   ip: "192.168.59.102",
-  #   virtualbox__intnet: "VirtualBox Host-Only Ethernet Adapter #2"
+  #   ip: host_ip,
+  #   virtualbox__intnet: host_network
 
-  # Disable the SharedFoldersEnableSymlinksCreate setting
+  # Disable the Shared folders
   config.vm.synced_folder ".", "/vagrant", disabled: true
-
-  # Enable provisioning (optional, for custom setup)
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo apt update
-    sudo apt install -y net-tools git vim
-    sudo useradd -m -s /bin/bash neeraj
-    echo "neeraj:123456" | sudo chpasswd
-  SHELL
 
 end
