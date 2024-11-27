@@ -1,5 +1,5 @@
 # convert .vdi to .box format
-vagrant package --provider "virtualbox" --base Testing --output default-server.box
+vagrant package --base Testing --output default-server.box
 
 # add it to vagrant's box list
 vagrant box add default-server/jammy64 default-server.box
