@@ -1,0 +1,9 @@
+1. Create the VM using ISO file.
+2. Create the disk of size 100G, and use LVM partition
+3. Create "neeraj" user
+4. Update sudoers file:
+    echo "neeraj ALL=(ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/neeraj
+5. Install all the required packages
+    net-tools, vim, plocate, ngrep, git
+6. Set the timzone
+7. Set the netplan file
