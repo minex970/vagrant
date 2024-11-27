@@ -2,18 +2,19 @@ require 'yaml'
 
 Vagrant.configure("2") do |config|
   # Load the YAML file and parse it
-  config_data = YAML.load_file('config.yml')
+  config_data = YAML.load_file('config.yaml')
 
   # Assign values from the YAML file
   box_name = config_data['box_name']
   name = config_data['name']
   hostname = config_data['hostname']
+  username = config_data['username']
+  password = config_data['password']
   memory = config_data['memory']
   cpu = config_data['cpu']
   bridge_ip = config_data['bridge_ip']
   host_ip = config_data['host_ip']
   host_network = config_data['host_network']
-
 
   # Base box for Ubuntu 22.04 (Jammy)
   config.vm.box = box_name
@@ -35,14 +36,13 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--boot1", "disk"]
   end
 
-  # Network settings
   # Bridge network
   config.vm.network "public_network",
-    type: "static",
-    ip: bridge_ip,
-    gateway: bridge_gw,
-    netmask: "255.255.255.0",
-    nameservers: ["8.8.8.8", "8.8.4.4"]
+    # ip: bridge_ip,
+    # gateway: bridge_gateway,
+    # netmask: "255.255.255.0",
+    # nameservers: ["8.8.8.8", "8.8.4.4"],
+    type: "dhcp"
 
   # Host-only network
   # config.vm.network "private_network",
@@ -52,5 +52,15 @@ Vagrant.configure("2") do |config|
 
   # Disable the Shared folders
   config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  # Override the SSH settings
+  config.ssh.username = "neeraj"  # Replace with your username
+  config.ssh.password = "123456"  # Replace with your password
+  config.ssh.insert_key = false
+
+  # Enable provisioning (optional, for custom setup)
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo date
+  # SHELL
 
 end
