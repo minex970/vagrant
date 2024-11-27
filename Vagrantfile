@@ -25,10 +25,10 @@ Vagrant.configure("2") do |config|
     netmask: "255.255.255.0",
     nameservers: ["8.8.8.8", "8.8.4.4"]
 
-  config.vm.network "private_network",
-    type: "static",
-    ip: "192.168.59.102",
-    virtualbox__intnet: "VirtualBox Host-Only Ethernet Adapter #2"
+  # config.vm.network "private_network",
+  #   type: "static",
+  #   ip: "192.168.59.102",
+  #   virtualbox__intnet: "VirtualBox Host-Only Ethernet Adapter #2"
 
   # Disable the SharedFoldersEnableSymlinksCreate setting
   config.vm.synced_folder ".", "/vagrant", disabled: true
