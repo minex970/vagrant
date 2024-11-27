@@ -1,7 +1,7 @@
 box_name: "server-template/jammy64"
 name: test
 hostname: test-server
-username: "neeraj"
+username: "minex"
 password: "123456"
 memory: "1024"
 cpu: 1
