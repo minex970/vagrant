@@ -1,44 +1,108 @@
+require 'yaml'
+
 Vagrant.configure("2") do |config|
+  # Load the YAML file and parse it
+  config_data = YAML.load_file('config.yaml')
+
+  # Debugging output
+  puts "Loaded config_data: #{config_data.inspect}"
+
+  # Assign values from the YAML file
+  box_name = config_data['box_name']
+  name = config_data['name']
+  hostname = config_data['hostname']
+  username = config_data['username']
+  password = config_data['password']
+  memory = config_data['memory']
+  cpu = config_data['cpu']
+
   # Base box for Ubuntu 22.04 (Jammy)
-  config.vm.box = "ubuntu/jammy64"
+  config.vm.box = box_name
 
   # Set the hostname
-  config.vm.hostname = "test-vm"
+  config.vm.hostname = hostname
 
   # VirtualBox provider configuration
   config.vm.provider "virtualbox" do |vb|
-    vb.name = "test"
-    vb.memory = "1024"
-    vb.cpus = 1
+    vb.name = name
+    vb.memory = memory
+    vb.cpus = cpu
+    # Set the graphics controller
     vb.customize ["modifyvm", :id, "--graphicscontroller", "VMSVGA"]
+    # Enable USB
     vb.customize ["modifyvm", :id, "--usb", "on"]
     vb.customize ["modifyvm", :id, "--usbehci", "on"]
     # Set boot order to hard disk (hasddisk)
     vb.customize ["modifyvm", :id, "--boot1", "disk"]
   end
 
-  # Network settings
-  config.vm.network "public_network",
-    type: "static",
-    ip: "192.168.0.115",
-    gateway: "192.168.0.1",
-    netmask: "255.255.255.0",
-    nameservers: ["8.8.8.8", "8.8.4.4"]
+  # Configure a bridge network
+  if config_data['networks']['bridge']
+    # Debugging output
+    puts "Bridge setting: #{config_data['networks']['bridge']}"
+    public_network_options = if config_data['bridge']['type'] == "dhcp"
+                        # Debugging output
+                        puts "DHCP setting: #{config_data['bridge']['type']}"
+                        {
+                          type: config_data['bridge']['type']
+                        }
+                      elsif config_data['bridge']['type'] == "static"
+                        {
+                          type: config_data['bridge']['type'],
+                          ip: config_data['bridge']['ip'],
+                          gateway: config_data['bridge']['gateway'],
+                          netmask: "255.255.255.0", # Default netmask
+                          nameservers: ["8.8.8.8", "8.8.4.4"] # Default nameserver
+                        }
+                      end
 
-  # config.vm.network "private_network",
-  #   type: "static",
-  #   ip: "192.168.59.102",
-  #   virtualbox__intnet: "VirtualBox Host-Only Ethernet Adapter #2"
+    # Debugging output
+    puts "Public Network options: #{public_network_options.inspect}"
+    config.vm.network "public_network", **public_network_options
+  end
 
-  # Disable the SharedFoldersEnableSymlinksCreate setting
+  # Configure a host-only network
+  if config_data['networks']['hostonly']
+    # Debugging output
+    puts "Host-only setting: #{config_data['networks']['hostonly']}"
+    private_network_options = if config_data['hostonly']['use_existing']
+                        {
+                          type: 'static', # Default to static type
+                          ip: config_data['hostonly']['ip'],
+                          virtualbox__intnet: config_data['hostonly']['network']
+                        }
+                      else
+                        # Debugging output
+                        puts "Use existing hostonly: #{config_data['hostonly']['use_existing']}"
+                        {
+                          type: 'static', # Default to static type
+                          ip: config_data['hostonly']['ip']
+                        }
+                      end
+
+    # Add DHCP or static type logic
+    if config_data['hostonly']['type'] == "dhcp"
+      private_network_options.delete(:ip) # Remove static IP if type is DHCP
+      private_network_options[:type] = "dhcp"
+    end
+
+    # Debugging output
+    puts "Private Network options: #{private_network_options.inspect}"
+    config.vm.network "private_network", **private_network_options
+  end
+
+
+  # Disable the Shared folders
   config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  # Override the SSH settings
+  config.ssh.username = username  # Replace with your username
+  config.ssh.password = password  # Replace with your password
+  config.ssh.insert_key = false
 
   # Enable provisioning (optional, for custom setup)
   config.vm.provision "shell", inline: <<-SHELL
-    sudo apt update
-    sudo apt install -y net-tools git vim
-    sudo useradd -m -s /bin/bash neeraj
-    echo "neeraj:123456" | sudo chpasswd
+    apt install -y build-essential
   SHELL
 
 end

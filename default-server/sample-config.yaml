@@ -1,0 +1,22 @@
+box_name: "default-server/jammy64"
+name: test
+hostname: test-server
+username: "minex"
+password: "123456"
+memory: "1024"
+cpu: 1
+
+networks:
+  bridge: true
+  hostonly: false
+
+bridge:
+  type: dhcp
+  ip: "192.168.0.116"
+  gateway: "192.168.0.1"
+
+hostonly:
+  use_existing: false
+  type: dhcp
+  ip: "192.168.59.103"
+  network: "VirtualBox Host-Only Ethernet Adapter #2"

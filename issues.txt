@@ -1,0 +1,3 @@
+Login with SSH key
+IP was not configured
+Rename custom disk name
