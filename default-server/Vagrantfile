@@ -35,13 +35,13 @@ Vagrant.configure("2") do |config|
 
   # Configure a bridge network
   if config_data['networks']['bridge']
-    network_options = if config_data['bridge']['type'] == "dhcp"
+    public_network_options = if config_data['bridge']['type'] == "dhcp"
                         {
-                          type: config_data['hostonly']['type']
+                          type: config_data['bridge']['type']
                         }
                       elsif config_data['bridge']['type'] == "static"
                         {
-                          type: config_data['hostonly']['type'],
+                          type: config_data['bridge']['type'],
                           ip: config_data['bridge']['ip'],
                           gateway: config_data['bridge']['gateway'],
                           netmask: "255.255.255.0", # Default netmask
@@ -49,12 +49,12 @@ Vagrant.configure("2") do |config|
                         }
                       end
 
-    config.vm.network "public_network", **network_options
+    config.vm.network "public_network", **public_network_options
   end
 
   # Configure a host-only network
   if config_data['networks']['hostonly']
-    network_options = if config_data['hostonly']['use_existing']
+    private_network_options = if config_data['hostonly']['use_existing']
                         {
                           type: 'static', # Default to static type
                           ip: config_data['hostonly']['ip'],
@@ -69,11 +69,11 @@ Vagrant.configure("2") do |config|
 
     # Add DHCP or static type logic
     if config_data['hostonly']['type'] == "dhcp"
-      network_options.delete(:ip) # Remove static IP if type is DHCP
-      network_options[:type] = "dhcp"
+      private_network_options.delete(:ip) # Remove static IP if type is DHCP
+      private_network_options[:type] = "dhcp"
     end
 
-    config.vm.network "private_network", **network_options
+    config.vm.network "private_network", **private_network_options
   end
 
 
